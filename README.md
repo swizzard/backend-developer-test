@@ -34,7 +34,7 @@ You are the architect in charge of creating the API that the clients will consum
 ### Your task:
 
 1. Fork this repo.
-2. Produce a fully functional API in Node.js or Haskell _(extra points)_ and Mongodb that fulfils these requirements. You have one week.
+2. Produce a fully functional API in Node.js or Haskell _(extra points)_ and Mongodb or PostGres that fulfils these requirements. You have one week.
 3. Make the API public, deploy it to your service of choice (e.g. AWS, Heroku, Digital Ocean...).
 4. Create a readme file explaining your technical choices, and if you have them, your ideas and suggestions.
 5. Send us a PR!
