@@ -42,10 +42,10 @@ makeLenses ''GameInstance
 notActive :: GameInstance -> Bool
 notActive = views active not
 
--- | check if the number of 'User's in a 'GameInstance' is less than the maximum allowed
--- by its 'GameType'
+-- | check if the number of 'User's in a 'GameInstance' (including the host)
+-- is less than the maximum allowed by its 'GameType'
 playersUnderCap :: GameInstance -> Bool
-playersUnderCap = arrc (<=) currPlayers maxPlayers where
+playersUnderCap = arrc (<) currPlayers maxPlayers where
   currPlayers = views players length
   maxPlayers = views (gType . numPlayers) (foldl1 max)
 

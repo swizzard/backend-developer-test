@@ -30,3 +30,18 @@ instance Ord GameType where
 
 deriveJSON aOpts ''GameType
 makeLenses ''GameType
+
+-- | GameType as returned by PostgREST in certain cases. Like 'Location.LatLng', sometimes
+-- the easist way to handle this kind of thing is to implement 'FromJSON' for them
+data GTR = GTR { gtrId :: Int
+               , gtrGameTypeName :: GameTypeName
+               } deriving (Eq, Generic, Show)
+
+instance FromJSON GTR where
+  parseJSON = withObject "GTR" $ \v -> do
+    pk <- v .: "id"
+    n <- v .: "gametypename"
+    return $ GTR pk n
+
+instance ToJSON GTR where
+  toJSON (GTR pk n) = object ["id" .= pk, "gametypename" .= n]

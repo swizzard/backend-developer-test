@@ -24,10 +24,15 @@ dependencies:
 - aeson
 - bytestring
 - containers
+- envy
 - lens
+- lens-aeson
 - mime-mail-ses
+- mtl
 - servant
+- servant-server
 - text
+- transformers
 - wreq
 
 library:

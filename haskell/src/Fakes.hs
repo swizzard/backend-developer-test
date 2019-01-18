@@ -6,7 +6,7 @@ import qualified Data.Set as S
 
 import Types.Game.GameType (GameType(..), GameTypeName)
 import Types.Location (Location(..))
-import Types.User (Age(..), User(..), UserName)
+import Types.User (Age(..), User(..), UserName, NewUser(..))
 
 l1 :: Location
 l1 = Location "Austin, TX, USA" 30.267 (-97.743)
@@ -35,21 +35,28 @@ risk = GameType "Risk" [3,4,5]
 
 
 u1 :: User
-u1 = User "abc123" "User One" (Age 20) l1
+u1 = User 1 "user1@example.com" "abc123" "User One" (Age 20) l1
           (S.fromList ["Chess", "Settlers of Catan", "Risk"])
           True
 
 u2 :: User
-u2 = User "def456" "User Two" (Age 33) l2
+u2 = User  2 "user2@example.com" "def456" "User Two" (Age 33) l2
           (S.fromList ["Chess", "Risk"])
           False
 
 u3 :: User
-u3 = User "ghi789" "User Three" (Age 40) l3
+u3 = User 3 "user3@example.com" "ghi789" "User Three" (Age 40) l3
           (S.fromList ["Settlers of Catan"])
           True
 
 u4 :: User
-u4 = User "jkl012" "User Four" (Age 15) l5
+u4 = User 4 "user4@example.com" "jkl012" "User Four" (Age 15) l5
           (S.fromList ["Settlers of Catan", "Risk"])
           False
+
+
+nu :: NewUser
+nu = NewUser "new@example.com" "abc123" "New User" (Age 33) "Austin, TX" True
+
+nu2 :: NewUser
+nu2 = NewUser "new2@example.com" "def456" "New User2" (Age 20) "London, England" True

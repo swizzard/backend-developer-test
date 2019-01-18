@@ -13,8 +13,12 @@ services:
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
       DB_ANON_ROLE: ${DB_ANON_ROLE}
       DB_APP_ROLE: ${DB_APP_ROLE}
+      APP_USER_JWT: ${APP_USER_JWT}
+      MQ_KEY: ${MQ_KEY}
     depends_on:
       - postgrest
+    ports:
+      - "8000:8000"
   db:
     image: postgres:latest
     environment:
@@ -26,6 +30,8 @@ services:
     networks:
       app:
         ipv4_address: ${DB_IP_ADDR}
+    ports:
+      - "5433:5432"
   postgrest:
     build:
       context: ./postgrest
@@ -47,10 +53,8 @@ services:
       PGRST_PROXY_URI: ${PGRST_PROXY_URI}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
       PGRST_SECRET_IS_BASE64: ${PGRST_SECRET_IS_BASE64}
-      PGRST_JWT_AUD: ${PGRST_JWT_AUD}
       PGRST_ROLE_CLAIM_KEY: ${PGRST_ROLE_CLAIM_KEY}
       PGRST_MAX_ROWS: ${PGRST_MAX_ROWS}
-      PGRST_PRE_REQUEST: ${PGRST_PRE_REQUEST}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}

@@ -8,10 +8,9 @@ module Types.User where
 
 import Control.Lens
 import Control.Lens.TH
-import Data.Aeson (FromJSON, ToJSON, object, parseJSON, toJSON, withObject, (.:))
+import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Aeson as A
-import Data.ByteString (ByteString)
-import qualified Data.ByteString as B
+import Data.Aeson.TH
 import Data.List (sortBy)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
@@ -24,19 +23,24 @@ import qualified Data.Text as T
 import GHC.Generics
 
 import AesonHelpers (aOpts)
-import Types.Location (Location, distanceFrom)
+import Types.Location
 import Types.Game.GameType (GameTypeName)
 
 newtype Age = Age { unAge:: Integer } deriving (Eq, Generic, Show, FromJSON, ToJSON)
 
--- | GAPI auth token
-newtype Token = Token { unToken :: ByteString } deriving (Eq, Generic, IsString, Show)
+newtype Email = Email { unEmail :: Text }
+  deriving (Eq, Generic, IsString, Show, FromJSON, ToJSON)
 
 newtype UserName = UserName { unUserName :: Text }
   deriving (Eq, Generic, Show, IsString, FromJSON, ToJSON)
 
+newtype GToken = GToken { unGToken :: Text }
+  deriving (Eq, Generic, IsString, Show, FromJSON, ToJSON)
+
 data User = User {
-            _token :: Token
+            _id :: Int
+          , _email :: Email
+          , _token :: GToken
           , _userName :: UserName
           , _age :: Age
           , _location :: Location
@@ -45,34 +49,26 @@ data User = User {
           } deriving (Eq, Generic, Show)
 
 instance ToJSON User where
-  toJSON User{..} = object [ "token" A..= B.unpack (unToken _token)
-                          , "userName" A..= toJSON _userName
-                          , "age" A..= toJSON _age
-                          , "location" A..= toJSON _location
-                          , "interestedIn" A..= toJSON _interestedIn
-                          , "canHost" A..= _canHost
-                          ]
+  toEncoding = A.genericToEncoding aOpts
 
 instance FromJSON User where
-  parseJSON = withObject "User" $ \v -> do
-    tk <- v .: "token" >>= parseJSON
-    uname <- v .: "userName" >>= parseJSON
-    loc <- v .: "location" >>= parseJSON
-    age' <- v .: "age"
-    int <- v .: "interests" >>= parseJSON
-    ch <- v .: "canHost"
-    return $ User (Token $ B.pack tk) uname age' loc int ch
+  parseJSON = A.withObject "User" $ \v -> do
+    pk <- v A..: "id"
+    em <- v A..: "email"
+    tk <- v A..: "token"
+    un <- v A..: "username"
+    ag <- v A..: "age"
+    lo <- v A..: "location"
+    ii <- v A..:? "interestedin" A..!= S.empty
+    ch <- v A..: "canhost"
+    return $ User pk em tk un ag lo ii ch
+
 
 instance Ord User where
-  compare = comparing (unToken . _token)
+  compare = comparing _id
 
 makeLenses ''User
 
-
--- | helper function to make 'User's
-makeUser :: ByteString -> Text -> Integer -> Bool -> Location -> User
-makeUser tk name age ch loc = User (Token tk) (UserName name) (Age age)
-                                   loc S.empty ch
 
 -- | helper function to add a 'Types.Game.GameType' to a 'User'\'s interests
 addInterest :: User -> GameTypeName -> User
@@ -95,3 +91,20 @@ userToInterests u = u ^. interestedIn & M.fromSet (const [u])
 -- | sort a list of 'User's by their distance from a given location
 sortByDist :: Location -> [User] -> [User]
 sortByDist l = sortBy (comparing (views location (distanceFrom l)))
+
+
+data NewUser = NewUser {
+               _nEmail :: Email
+             , _nToken :: GToken
+             , _nUserName :: UserName
+             , _nAge :: Age
+             , _nLocationName :: LocationName
+             , _nCanHost :: Bool
+             } deriving (Eq, Generic, Show)
+
+makeLenses ''NewUser
+
+instance ToJSON NewUser where
+  toJSON NewUser{..} = A.object ["email" A..= _nEmail, "token" A..= _nToken,
+                                "username" A..= _nUserName, "age" A..= _nAge,
+                                "location" A..= _nLocationName, "canhost" A..= _nCanHost]

@@ -1,1 +1,1 @@
-/home/run-migrations.sh && exec postgrest /etc/postgrest.conf
+/home/run-migrations.sh && exec postgrest /home/postgrest.conf
